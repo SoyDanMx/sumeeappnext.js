@@ -1,48 +1,42 @@
 export default function HowItWorksSection() {
   return (
     <section className="py-20 px-6 bg-white">
-      <div className="container mx-auto">
-        <h2 className="text-4xl font-bold text-center mb-12 text-gray-800">
-          Cómo Funciona / How It Works
+      <div className="container mx-auto text-center">
+        <h2 className="text-4xl font-bold mb-12 text-gray-800">
+          ¿Cómo funciona? / How It Works
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-          <div className="text-center p-6 rounded-lg hover:bg-gray-50 transition-colors duration-300">
-            <div className="flex items-center justify-center mb-4">
-              <div className="bg-primary text-white rounded-full w-14 h-14 flex items-center justify-center text-2xl font-bold shadow-md">
-                1
-              </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="space-y-4">
+            <div className="flex justify-center">
+              <i className="ri-search-line text-5xl text-primary"></i>
             </div>
-            <h3 className="text-xl font-semibold mb-3 text-gray-800">
-              Busca un servicio / Search for a service
+            <h3 className="text-xl font-semibold text-gray-800">
+              1. Busca / Search
             </h3>
             <p className="text-gray-600 leading-relaxed">
               Ingresa el servicio que necesitas y tu ubicación.
             </p>
           </div>
-          <div className="text-center p-6 rounded-lg hover:bg-gray-50 transition-colors duration-300">
-            <div className="flex items-center justify-center mb-4">
-              <div className="bg-primary text-white rounded-full w-14 h-14 flex items-center justify-center text-2xl font-bold shadow-md">
-                2
-              </div>
+          <div className="space-y-4">
+            <div className="flex justify-center">
+              <i className="ri-user-search-line text-5xl text-primary"></i>
             </div>
-            <h3 className="text-xl font-semibold mb-3 text-gray-800">
-              Encuentra un experto / Find an expert
+            <h3 className="text-xl font-semibold text-gray-800">
+              2. Encuentra / Find
             </h3>
             <p className="text-gray-600 leading-relaxed">
-              Explora profesionales cerca de ti y revisa sus calificaciones.
+              Explora una lista de técnicos confiables cerca de ti.
             </p>
           </div>
-          <div className="text-center p-6 rounded-lg hover:bg-gray-50 transition-colors duration-300">
-            <div className="flex items-center justify-center mb-4">
-              <div className="bg-primary text-white rounded-full w-14 h-14 flex items-center justify-center text-2xl font-bold shadow-md">
-                3
-              </div>
+          <div className="space-y-4">
+            <div className="flex justify-center">
+              <i className="ri-chat-smile-3-line text-5xl text-primary"></i>
             </div>
-            <h3 className="text-xl font-semibold mb-3 text-gray-800">
-              Contrata con confianza / Hire with confidence
+            <h3 className="text-xl font-semibold text-gray-800">
+              3. Conecta / Connect
             </h3>
             <p className="text-gray-600 leading-relaxed">
-              Contacta al experto y agenda tu servicio fácilmente.
+              Contacta al técnico que mejor se adapte a tus necesidades.
             </p>
           </div>
         </div>

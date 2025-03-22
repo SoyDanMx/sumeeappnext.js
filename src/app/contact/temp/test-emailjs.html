@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Prueba de EmailJS</title>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+<body>
+  <h1>Prueba de EmailJS</h1>
+  <button onclick="sendEmail()">Enviar Correo de Prueba</button>
+  <script>
+    emailjs.init("uTEWIWOgwP7ziXaIA");
+
+    function sendEmail() {
+      emailjs
+        .send("service_08xf9xl", "template_bto0m05", {
+          name: "Usuario de Prueba",
+          email: "prueba@correo.com",
+          message: "Este es un mensaje de prueba",
+          title: "Nuevo mensaje de contacto",
+        })
+        .then(
+          (response) => {
+            console.log("Correo enviado con éxito:", response);
+            alert("Correo enviado con éxito");
+          },
+          (error) => {
+            console.error("Error:", error);
+            console.error("Status:", error.status);
+            console.error("Texto del error:", error.text);
+            alert("Error al enviar el correo: " + (error.text || "Sin detalles"));
+          }
+        );
+    }
+  </script>
+</body>
+</html>
