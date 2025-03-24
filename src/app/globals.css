@@ -2,14 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: "Inter", sans-serif;
+:root {
+  --primary: #7209CF;
+  --secondary: #888888;
 }
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
 .search-input::-webkit-search-cancel-button {
   display: none;
 }
+
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+.rounded-button {
+  border-radius: 8px;
 }
