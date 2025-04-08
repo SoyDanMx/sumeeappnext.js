@@ -1,7 +1,9 @@
+// src/components/Header.js
 "use client";
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image'; // Importar Image para el logo
 
 export default function Header() {
   const [language, setLanguage] = useState('ES');
@@ -13,8 +15,14 @@ export default function Header() {
   return (
     <header className="fixed w-full bg-gradient-to-b from-white to-transparent z-50">
       <nav className="container mx-auto px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="font-['Pacifico'] text-primary text-3xl">
-          Sumee
+        <Link href="/">
+          <Image
+            src="/logo.png"
+            alt="SUMEE Logo"
+            width={400} // Ajusta según la proporción de tu logo
+            height={90}
+            className="max-h-10 w-auto"
+          />
         </Link>
         <div className="flex items-center gap-6">
           <button className="text-primary border border-primary px-4 py-2 rounded-button hover:bg-primary hover:text-white transition-colors whitespace-nowrap cursor-pointer">

@@ -1,27 +1,18 @@
-import Header from "../../components/Header";
-import Footer from "../../components/Footer";
-
+// src/app/about/page.js
 export default function About() {
   return (
-    <main>
-      <Header />
-      <section className="py-20 px-6 bg-gray-50 min-h-screen">
-        <div className="container mx-auto">
-          <h1 className="text-4xl font-bold mb-8 text-gray-800">Acerca de Sumee / About Sumee</h1>
-          <div className="prose max-w-none text-gray-600">
-            <p className="mb-6">
-              Sumee es una plataforma diseñada para conectar a personas con técnicos confiables y profesionales en su área. Nuestra misión es facilitar la búsqueda de servicios técnicos, desde electricistas hasta plomeros, asegurando que encuentres expertos calificados en minutos.
-            </p>
-            <p className="mb-6">
-              Fundada en 2025, Sumee nació con la visión de simplificar la vida de nuestros usuarios. Creemos en la importancia de la confianza y la calidad, por eso todos nuestros técnicos pasan por un proceso de verificación para garantizar que cumplen con los más altos estándares.
-            </p>
-            <p>
-              Únete a nuestra comunidad y descubre cómo Sumee puede ayudarte a resolver tus necesidades técnicas de manera rápida y eficiente.
-            </p>
-          </div>
-        </div>
-      </section>
-      <Footer />
-    </main>
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center py-12">
+      <div className="max-w-4xl mx-auto px-4">
+        <h1 className="text-4xl font-bold text-primary mb-6">Sobre Nosotros / About Us</h1>
+        <p className="text-lg text-gray-700 mb-4">
+          Bienvenido a SUMEE, tu solución para encontrar servicios profesionales de confianza. 
+          Nos dedicamos a conectar a clientes con expertos en diversas áreas, garantizando calidad y satisfacción.
+        </p>
+        <p className="text-lg text-gray-700">
+          Nuestra misión es facilitar el acceso a servicios de alta calidad mientras apoyamos a profesionales 
+          independientes para que crezcan en sus carreras.
+        </p>
+      </div>
+    </div>
   );
 }

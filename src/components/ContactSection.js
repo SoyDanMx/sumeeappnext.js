@@ -82,7 +82,7 @@ export default function ContactSection() {
     <section className="py-20 px-6 bg-gray-50">
       <div className="container mx-auto">
         <h2 className="text-3xl font-bold text-center mb-12">
-          Contáctanos / Contact Us
+          Registra tu Interes en la Plataforma  / Register your interes in the App
         </h2>
         <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-6">

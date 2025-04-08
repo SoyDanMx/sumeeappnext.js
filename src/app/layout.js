@@ -1,6 +1,7 @@
-import 'leaflet/dist/leaflet.css';
-import '../styles/globals.css';
-import Head from 'next/head';
+import "leaflet/dist/leaflet.css";
+import "../styles/globals.css";
+import Head from "next/head";
+import WhatsAppButton from "../components/WhatsAppButton";
 
 export default function RootLayout({ children }) {
   return (
@@ -13,11 +14,14 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
         <link
-          href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
+          href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css"
           rel="stylesheet"
         />
       </Head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <WhatsAppButton />
+      </body>
     </html>
   );
 }

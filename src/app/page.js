@@ -1,23 +1,24 @@
+// src/app/page.js
 import Header from '../components/Header';
 import HeroSection from '../components/HeroSection';
 import ServicesSection from '../components/ServicesSection';
 import HowItWorksSection from '../components/HowItWorksSection';
-import MapSection from '../components/MapSection';
-import ContactSection from '../components/ContactSection'; // Nueva importación
+import MapSection from '../components/MapSection'; // Importar MapSection
+import ContactSection from '../components/ContactSection';
 import Footer from '../components/Footer';
+import WhatsAppButton from '../components/WhatsAppButton';
 
 export default function Home() {
   return (
-    <div className="bg-white min-h-screen">
+    <main>
       <Header />
-      <main>
-        <HeroSection />
-        <ServicesSection />
-        <HowItWorksSection />
-        <MapSection />
-        <ContactSection /> {/* Nueva sección */}
-      </main>
+      <HeroSection />
+      <ServicesSection />
+      <HowItWorksSection />
+      <MapSection /> {/* Agregar MapSection */}
+      <ContactSection />
+      <WhatsAppButton />
       <Footer />
-    </div>
+    </main>
   );
 }
