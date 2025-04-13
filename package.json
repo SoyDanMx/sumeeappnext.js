@@ -10,15 +10,22 @@
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
+    "@prisma/client": "^6.6.0",
     "@react-google-maps/api": "^2.20.6",
     "@react-leaflet/core": "^2.1.0",
+    "@stripe/stripe-js": "^7.0.0",
+    "bcrypt": "^5.1.1",
+    "js-cookie": "^3.0.5",
+    "jsonwebtoken": "^9.0.2",
     "leaflet": "^1.9.4",
+    "mercadopago": "^2.4.0",
     "next": "^15.2.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^5.5.0",
     "react-leaflet": "^4.2.1",
-    "remixicon": "^4.6.0"
+    "remixicon": "^4.6.0",
+    "stripe": "^18.0.0"
   },
   "devDependencies": {
     "autoprefixer": "10.4.14",
@@ -28,6 +35,7 @@
     "postcss-import": "15.1.0",
     "postcss-nested": "6.0.1",
     "postcss-preset-env": "9.1.0",
+    "prisma": "^6.6.0",
     "style-loader": "^3.3.3",
     "tailwindcss": "3.3.5"
   }

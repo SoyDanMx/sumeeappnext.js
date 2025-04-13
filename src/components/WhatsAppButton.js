@@ -13,7 +13,7 @@ const WhatsAppButton = () => {
       aria-label="Contactar por WhatsApp"
     >
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium">Deseo Información</span>
+        <span className="text-sm font-medium">Deseo Informacion</span>
         <FaWhatsapp size={30} />
       </div>
     </a>

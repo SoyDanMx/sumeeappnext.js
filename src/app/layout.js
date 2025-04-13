@@ -1,11 +1,31 @@
+// src/app/layout.js
 import "leaflet/dist/leaflet.css";
 import "../styles/globals.css";
 import Head from "next/head";
-import WhatsAppButton from "../components/WhatsAppButton";
+import ClientWhatsAppButton from '../components/ClientWhatsAppButton';
+
+export const metadata = {
+  title: 'Sumee App - Únete a nuestra plataforma',
+  description: 'Regístrate en Sumee App para unirte a nuestra lista de espera y descubre nuestros servicios.',
+  keywords: 'sumee app, lista de espera, membresía, servicios, contacto',
+  openGraph: {
+    title: 'Sumee App - Únete a nuestra plataforma',
+    description: 'Regístrate en Sumee App para unirte a nuestra lista de espera y descubre nuestros servicios.',
+    url: 'https://sumeeapp.com',
+    siteName: 'Sumee App',
+    locale: 'es_MX',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Sumee App - Únete a nuestra plataforma',
+    description: 'Regístrate en Sumee App para unirte a nuestra lista de espera y descubre nuestros servicios.',
+  },
+};
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="es">
+    <html lang="es" style={{ scrollBehavior: 'smooth' }}>
       <Head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -18,9 +38,9 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </Head>
-      <body>
+      <body className="pt-16">
         {children}
-        <WhatsAppButton />
+        <ClientWhatsAppButton />
       </body>
     </html>
   );

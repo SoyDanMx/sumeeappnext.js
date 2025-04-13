@@ -44,10 +44,10 @@ export default function Footer() {
               />
             </Link>
             <p className="text-gray-400">The One-Click Technical Support</p>
-            <p className="text-gray-400 mt-4">A Nuo Networks Company</p>
+            <p className="text-gray-400 mt-4">Powered by NUO INTEGRACIONES</p>
           </div>
           <div>
-            <h4 className="font-semibold mb-6 text-lg">Enlaces Rápidos / Quick Links</h4>
+            <h4 className="font-semibold mb-6 text-lg">Acerca de Sumee / About Sumee</h4>
             <ul className="space-y-4">
               <li>
                 <Link href="/about" className="text-gray-400 hover:text-primary transition-colors duration-300 flex items-center gap-2">

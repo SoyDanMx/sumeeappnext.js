@@ -1,91 +1,122 @@
 // src/app/membership/page.js
-import Link from "next/link";
+"use client";
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { loadStripe } from '@stripe/stripe-js';
+
+// Carga la clave pública de Stripe desde las variables de entorno
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
 export default function Membership() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        console.log('Verificando autenticación...');
+        const response = await fetch('/api/check-auth', {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          console.log('Error en autenticación:', data.error);
+          setError('Debes iniciar sesión para comprar un membership. / You must log in to purchase a membership.');
+          setTimeout(() => router.push('/login'), 2000);
+          return;
+        }
+
+        console.log('Usuario autenticado correctamente');
+        setIsAuthenticated(true);
+      } catch (err) {
+        console.log('Error al verificar autenticación:', err.message);
+        setError('Error al verificar autenticación / Error checking authentication');
+        setTimeout(() => router.push('/login'), 2000);
+      }
+    };
+
+    checkAuth();
+  }, [router]);
+
+  const handlePurchase = async () => {
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      // Hacer una solicitud al backend para crear una sesión de Stripe Checkout
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ plan: 'basic' }),
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al iniciar el pago / Error initiating payment');
+      }
+
+      // Redirigir al usuario a la página de Stripe Checkout
+      const stripe = await stripePromise;
+      const { error: stripeError } = await stripe.redirectToCheckout({
+        sessionId: data.sessionId,
+      });
+
+      if (stripeError) {
+        throw new Error(stripeError.message);
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  console.log('Estado actual:', JSON.stringify({ isAuthenticated, error, success, loading }, null, 2));
+
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-bold text-primary mb-8 text-center">
-          Membresía Sumee / Sumee Membership
+    <section className="py-20 px-6 bg-gray-50 min-h-screen">
+      <div className="container mx-auto max-w-2xl">
+        <h1 className="text-4xl font-bold text-center mb-8">
+          Comprar Membership / Purchase Membership
         </h1>
-        <div className="bg-white shadow-lg rounded-lg p-8">
-          <p className="text-lg text-gray-700 mb-6">
-            Únete a la Membresía Sumee y disfruta de soporte técnico de primera clase con beneficios exclusivos. Por solo MXP $500.00  al año, obtén descuentos, soporte prioritario y herramientas para gestionar tus necesidades técnicas de manera más eficiente.
+        <div className="bg-white p-8 rounded-lg shadow-sm">
+          <p className="text-lg mb-4">
+            Obtén un membership para acceder a la lista de profesionales y sus detalles. / Get a membership to access the list of professionals and their details.
           </p>
-          <ul className="space-y-6">
-            <li>
-              <h2 className="text-xl font-semibold text-primary mb-2">
-                1. Descuentos Exclusivos / Exclusive Discounts
-              </h2>
-              <p className="text-gray-600">
-                Ahorra un 15% en todas las sesiones de soporte técnico contratadas a través de nuestra plataforma. Ya sea que necesites ayuda con tu computadora, red Wi-Fi o cualquier dispositivo, con la Membresía Sumee obtienes el mejor precio.
-              </p>
-            </li>
-            <li>
-              <h2 className="text-xl font-semibold text-primary mb-2">
-                2. Soporte Prioritario / Priority Support
-              </h2>
-              <p className="text-gray-600">
-                Como miembro, tus solicitudes de soporte técnico se procesan con prioridad, conectándote con nuestros agentes verificados más rápido que nunca. Resuelve tus problemas técnicos en tiempo récord.
-              </p>
-            </li>
-            <li>
-              <h2 className="text-xl font-semibold text-primary mb-2">
-                3. Herramientas de Gestión / Management Tools
-              </h2>
-              <p className="text-gray-600">
-                Accede a un panel de control exclusivo donde puedes rastrear tus solicitudes de soporte, programar sesiones recurrentes (como mantenimiento mensual) y recibir recordatorios para mantener tus dispositivos en óptimas condiciones.
-              </p>
-            </li>
-            <li>
-              <h2 className="text-xl font-semibold text-primary mb-2">
-                4. Cancelación Flexible / Flexible Cancellation
-              </h2>
-              <p className="text-gray-600">
-                Puedes cancelar tu membresía en cualquier momento. Si cancelas dentro de los primeros 30 días, te reembolsaremos el costo total de la membresía, sin preguntas.
-              </p>
-            </li>
-            <li>
-              <h2 className="text-xl font-semibold text-primary mb-2">
-                5. Únete Hoy / Join Today
-              </h2>
-              <p className="text-gray-600">
-                La Membresía Sumee cuesta solo MXP $500.00 al año. Regístrate hoy y comienza a disfrutar de soporte técnico más rápido, económico y eficiente.
-              </p>
-              <div className="mt-4">
-                <Link
-                  href="/signup-membership"
-                  className="bg-primary text-white px-6 py-3 rounded-button hover:bg-opacity-90 transition-colors inline-block"
-                >
-                  Únete Ahora / Join Now
-                </Link>
-              </div>
-            </li>
-            <li>
-              <h2 className="text-xl font-semibold text-primary mb-2">
-                6. Contacto / Contact
-              </h2>
-              <p className="text-gray-600">
-                Si tienes preguntas sobre la Membresía Sumee, contáctanos en:
-              </p>
-              <ul className="list-none ml-4 mt-2 text-gray-600 space-y-1">
-                <li>Nuo Networks</li>
-                <li>Atenas 1-1 Col San Alvaro, Azcapotzalco, Ciudad de México, C.P. 02090</li>
-                <li>
-                  <a href="mailto:sumeeapp.com@gmail.com" className="text-primary hover:underline">
-                    sumeeapp.com@gmail.com
-                  </a>
-                </li>
-                <li>
-                  <a href="tel:+525567283971" className="text-primary hover:underline">
-                    +52 55 6728 3971
-                  </a>
-                </li>
-              </ul>
-            </li>
-          </ul>
+          <p className="text-gray-600 mb-4">
+            Plan Básico: $500/mes / Basic Plan: $500/month
+          </p>
+          {error && <p className="text-red-500 mb-4">{error}</p>}
+          {success && <p className="text-green-500 mb-4">{success}</p>}
+          {isAuthenticated && !error && !success ? (
+            <div className="text-center">
+              <button
+                onClick={handlePurchase}
+                disabled={loading}
+                className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 disabled:bg-gray-400"
+              >
+                {loading ? 'Procesando... / Processing...' : 'Pagar con Stripe / Pay with Stripe'}
+              </button>
+            </div>
+          ) : (
+            <p className="text-center text-gray-500">
+              Autenticando... / Authenticating...
+            </p>
+          )}
+          {loading && <p className="text-center">Cargando... / Loading...</p>}
         </div>
       </div>
-    </div>
+    </section>
   );
 }

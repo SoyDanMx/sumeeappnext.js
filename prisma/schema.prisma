@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo para Colaboradores Profesionales
+model ProCollaborator {
+  id          Int           @id @default(autoincrement())
+  name        String
+  email       String        @unique
+  phone       String?
+  profession  String
+  message     String?
+  area        String?
+  photo       String?
+  experience  String?
+  createdAt   DateTime      @default(now())
+  workPhotos  WorkPhoto[]   // Relación con una tabla separada para fotos
+  workedAreas WorkedArea[]  // Relación con una tabla separada para áreas trabajadas
+  ratings     Rating[]
+
+  @@index([profession])
+  @@index([area])
+}
+
+// Nueva tabla para normalizar las fotos de trabajo
+model WorkPhoto {
+  id              Int            @id @default(autoincrement())
+  url             String
+  proCollaboratorId Int
+  proCollaborator   ProCollaborator @relation(fields: [proCollaboratorId], references: [id])
+}
+
+// Nueva tabla para normalizar las áreas trabajadas
+model WorkedArea {
+  id              Int            @id @default(autoincrement())
+  name            String
+  proCollaboratorId Int
+  proCollaborator   ProCollaborator @relation(fields: [proCollaboratorId], references: [id])
+}
+
+// Modelo para Usuarios
+model User {
+  id         Int         @id @default(autoincrement())
+  name       String
+  email      String      @unique
+  password   String
+  role       String      @default("user") // Nuevo campo para roles (por ejemplo, "user", "admin")
+  createdAt  DateTime    @default(now())
+  membership Membership?
+  ratings    Rating[]
+}
+
+// Modelo para Membresías
+model Membership {
+  id                 Int       @id @default(autoincrement())
+  userId             Int       @unique
+  active             Boolean   @default(false)
+  plan               String    @default("basic") // Nuevo campo para tipo de membresía (por ejemplo, "basic", "premium")
+  stripeSubscriptionId String?   // Nuevo campo para almacenar el ID de la suscripción de Stripe
+  createdAt          DateTime  @default(now())
+  expiresAt          DateTime?
+  user               User      @relation(fields: [userId], references: [id])
+}
+
+// Modelo para Valoraciones
+model Rating {
+  id                Int             @id @default(autoincrement())
+  value             Int             @default(5) // Valor por defecto 5, podrías usar un rango 1-5
+  comment           String?
+  userId            Int
+  proCollaboratorId Int
+  createdAt         DateTime        @default(now())
+  proCollaborator   ProCollaborator @relation(fields: [proCollaboratorId], references: [id])
+  user              User            @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([proCollaboratorId])
+}

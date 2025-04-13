@@ -1,7 +1,9 @@
+// src/components/ContactSection.js
 "use client";
 
 import { useState, useEffect } from 'react';
 import emailjs from '@emailjs/browser';
+import Link from 'next/link';
 
 export default function ContactSection() {
   const [formData, setFormData] = useState({
@@ -81,11 +83,20 @@ export default function ContactSection() {
   return (
     <section className="py-20 px-6 bg-gray-50">
       <div className="container mx-auto">
-        <h2 className="text-3xl font-bold text-center mb-12">
-          Registra tu Interes en la Plataforma  / Register your interes in the App
-        </h2>
+        {/* Eliminamos el <h2> que duplicaba el texto */}
+        
+        {/* Botón "Unirse a la lista de espera / Join Waitlist" */}
+        <div className="text-center mb-8">
+          <Link href="#contact-form">
+            <button className="bg-primary text-white px-8 py-3 rounded-button hover:bg-opacity-90 transition-colors">
+              Unirse a la lista de espera / Join Waitlist
+            </button>
+          </Link>
+        </div>
+
+        {/* Formulario con ID para el desplazamiento */}
         <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-sm">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form id="contact-form" onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                 Nombre / Name *
@@ -153,6 +164,8 @@ export default function ContactSection() {
             </button>
           </form>
         </div>
+
+        {/* Notificación */}
         {notification && (
           <div className="fixed top-4 right-4 max-w-sm w-full bg-white rounded-lg shadow-lg z-50">
             <div

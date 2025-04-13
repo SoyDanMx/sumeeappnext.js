@@ -23,4 +23,7 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .rounded-button {
   border-radius: 8px;
+} /* src/styles/globals.css */
+html {
+  scroll-behavior: smooth;
 }
