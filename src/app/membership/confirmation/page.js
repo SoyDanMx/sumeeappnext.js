@@ -1,9 +1,16 @@
-// src/app/membership/confirmation/page.js
-"use client"; // Esto debe ser lo primero en el archivo
+"use client";
 
-import { Suspense, useState, useEffect } from 'react'; // Añade useState aquí
+import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
+
+export default function ConfirmationPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ConfirmationContent />
+    </Suspense>
+  );
+}
 
 function ConfirmationContent() {
   const router = useRouter();
@@ -12,13 +19,39 @@ function ConfirmationContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // ... resto del código del componente
-}
+  useEffect(() => {
+    const verifyPayment = async () => {
+      try {
+        const paymentId = searchParams.get('payment_id');
+        if (!paymentId) throw new Error('Missing payment ID');
+        
+        // Lógica para verificar pago con MercadoPago
+        const response = await fetch(`/api/verify-mercadopago?payment_id=${paymentId}`);
+        const data = await response.json();
+        
+        if (!response.ok) throw new Error(data.error || 'Payment verification failed');
+        
+        setPaymentStatus(data.status);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-export default function ConfirmationPage() {
+    verifyPayment();
+  }, [searchParams]);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <ConfirmationContent />
-    </Suspense>
+    <div>
+      {paymentStatus === 'approved' ? (
+        <div>Pago aprobado</div>
+      ) : (
+        <div>Pago pendiente</div>
+      )}
+    </div>
   );
 }

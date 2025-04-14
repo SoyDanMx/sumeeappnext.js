@@ -134,7 +134,7 @@ export default function ProfessionalProfile() {
             Perfil del Profesional / Professional Profile
           </h1>
           <p className="text-lg mb-4">
-            Necesitas un membership para ver los detalles del profesional. / You need a membership to view the professional's details.
+            Necesitas un membership para ver los detalles del profesional. / You need a membership to view the Professional&apos;s Details.
           </p>
           <Link href="/buy-membership">
             <button className="bg-primary text-white px-6 py-3 rounded-button hover:bg-opacity-90 transition-colors">
