@@ -1,13 +1,11 @@
 // src/app/api/purchase-membership/route.js
 import { PrismaClient } from '@prisma/client';
 import { verifyToken } from '../../../utils/auth';
-import MercadoPago from 'mercadopago';
+import mercadopago from 'mercadopago';
 
-const prisma = new PrismaClient();
-
-// Configurar Mercado Pago creando una instancia
-const mercadopago = new MercadoPago({
-  accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN,
+// Configurar MercadoPago con el access token
+mercadopago.configure({
+  access_token: process.env.MERCADO_PAGO_ACCESS_TOKEN,
 });
 
 export async function POST(request) {
@@ -37,6 +35,9 @@ export async function POST(request) {
 
     const userId = decoded.userId;
 
+    // Usar una URL base dinámica desde las variables de entorno
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+
     const preference = {
       items: [
         {
@@ -47,9 +48,9 @@ export async function POST(request) {
         },
       ],
       back_urls: {
-        success: 'http://localhost:3000/membership/confirmation',
-        failure: 'http://localhost:3000/membership/confirmation',
-        pending: 'http://localhost:3000/membership/confirmation',
+        success: `${baseUrl}/membership/confirmation`,
+        failure: `${baseUrl}/membership/confirmation`,
+        pending: `${baseUrl}/membership/confirmation`,
       },
       auto_return: 'approved',
       metadata: {
@@ -58,7 +59,7 @@ export async function POST(request) {
     };
 
     const response = await mercadopago.preferences.create(preference);
-    const paymentUrl = response.init_point;
+    const paymentUrl = response.body.init_point; // Acceder a init_point desde response.body
     console.log('Enlace de pago generado:', paymentUrl);
 
     return new Response(JSON.stringify({ paymentUrl }), {
@@ -73,6 +74,6 @@ export async function POST(request) {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
       }
-    ); // Aquí está el problema: falta una llave de cierre '}'
-  } // Falta esta llave para cerrar la función POST
-} // Falta esta llave para cerrar el archivo
+    );
+  }
+}
