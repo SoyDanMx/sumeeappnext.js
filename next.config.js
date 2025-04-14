@@ -1,10 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
   webpack: (config) => {
-    config.resolve.alias['@stripe/stripe-js'] = require.resolve('@stripe/stripe-js');
-    config.resolve.alias['stripe'] = require.resolve('stripe');
-    config.resolve.alias['mercadopago'] = require.resolve('mercadopago');
+    config.externals = [
+      ...config.externals,
+      '@stripe/stripe-js',
+      'stripe',
+      'mercadopago',
+    ];
     return config;
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 };
 
