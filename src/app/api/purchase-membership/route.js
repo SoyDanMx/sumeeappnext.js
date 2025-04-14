@@ -1,12 +1,21 @@
 // src/app/api/purchase-membership/route.js
 import { PrismaClient } from '@prisma/client';
 import { verifyToken } from '../../../utils/auth';
-import mercadopago from 'mercadopago';
+import { MercadoPagoConfig, Preference } from 'mercadopago';
+
+// Validar variables de entorno
+if (!process.env.MERCADO_PAGO_ACCESS_TOKEN) {
+  throw new Error('MERCADO_PAGO_ACCESS_TOKEN no está definido');
+}
+if (!process.env.NEXT_PUBLIC_BASE_URL) {
+  throw new Error('NEXT_PUBLIC_BASE_URL no está definido');
+}
 
 // Configurar MercadoPago con el access token
-mercadopago.configure({
-  access_token: process.env.MERCADO_PAGO_ACCESS_TOKEN,
+const client = new MercadoPagoConfig({
+  accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN,
 });
+const preference = new Preference(client);
 
 export async function POST(request) {
   try {
@@ -36,30 +45,38 @@ export async function POST(request) {
     const userId = decoded.userId;
 
     // Usar una URL base dinámica desde las variables de entorno
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
-    const preference = {
-      items: [
-        {
-          title: 'Membership Plan Básico',
-          unit_price: 10,
-          quantity: 1,
-          currency_id: 'MXN',
+    const result = await preference.create({
+      body: {
+        items: [
+          {
+            title: 'Suscripción Anual - Membership Plan Básico',
+            unit_price: 500, // Cambiar de 10 a 500 MXN
+            quantity: 1,
+            currency_id: 'MXN',
+          },
+        ],
+        payer: {
+          name: 'Comprador',
+          surname: 'Ejemplo',
+          email: 'comprador@ejemplo.com',
         },
-      ],
-      back_urls: {
-        success: `${baseUrl}/membership/confirmation`,
-        failure: `${baseUrl}/membership/confirmation`,
-        pending: `${baseUrl}/membership/confirmation`,
+        back_urls: {
+          success: `${baseUrl}/membership/confirmation`,
+          failure: `${baseUrl}/membership/confirmation`,
+          pending: `${baseUrl}/membership/confirmation`,
+        },
+        auto_return: 'approved',
+        metadata: {
+          user_id: userId,
+        },
+        external_reference: userId,
+        notification_url: `${baseUrl}/api/mercadopago-webhook`,
       },
-      auto_return: 'approved',
-      metadata: {
-        user_id: userId,
-      },
-    };
+    });
 
-    const response = await mercadopago.preferences.create(preference);
-    const paymentUrl = response.body.init_point; // Acceder a init_point desde response.body
+    const paymentUrl = result.init_point;
     console.log('Enlace de pago generado:', paymentUrl);
 
     return new Response(JSON.stringify({ paymentUrl }), {
