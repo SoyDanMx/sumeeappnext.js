@@ -6,7 +6,7 @@ import { FaWhatsapp } from 'react-icons/fa';
 const WhatsAppButton = () => {
   return (
     <a
-      href="https://wa.me/525515118907?text=¡Hola! Quiero más información sobre SUMEE App."
+      href="https://wa.me/525636741156?text=¡Hola! Quiero más información sobre SUMEE App."
       target="_blank"
       rel="noopener noreferrer"
       className="fixed bottom-8 right-8 bg-[#25D366] text-white px-6 py-3 rounded-lg shadow-lg hover:bg-[#20C35A] transition-all duration-300 animate-pulse"
