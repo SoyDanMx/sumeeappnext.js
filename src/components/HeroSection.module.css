@@ -1,0 +1,190 @@
+/* components/HeroSection.module.css */
+.hero {
+    padding: 80px 20px;
+    background-color: #f5f5f5;
+    position: relative;
+  }
+  
+  .banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1400px; /* Aumentamos el ancho máximo para dar más espacio */
+    margin: 0 auto;
+    min-height: 560px; /* Ajustamos la altura mínima para coincidir con la nueva imagen */
+  }
+  
+  .textSection {
+    flex: 1;
+    padding-right: 20px;
+  }
+  
+  .title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+  
+  .subtitle {
+    font-size: 1.25rem;
+    color: #666;
+    margin-bottom: 24px;
+  }
+  
+  .searchBar {
+    display: flex;
+    gap: 12px;
+    background-color: white;
+    padding: 8px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .inputWrapper {
+    position: relative;
+    flex: 1;
+  }
+  
+  .icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  .searchInput {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    font-size: 0.875rem;
+    border: none;
+    border-radius: 8px;
+    outline: none;
+    background-color: #f9f9f9;
+  }
+  
+  .searchInput:focus {
+    background-color: white;
+    box-shadow: 0 0 0 2px #007bff;
+  }
+  
+  .searchButton {
+    background-color: #007bff;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    white-space: nowrap;
+  }
+  
+  .searchButton:hover {
+    background-color: #0056b3;
+  }
+  
+  .imageSection {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  
+  .bannerImage {
+    border-radius: 10px;
+    object-fit: cover;
+    width: 100%; /* Aseguramos que la imagen use todo el ancho disponible */
+    height: auto; /* Mantiene la proporción */
+    max-width: 700px; /* Tamaño máximo igual al width definido en <Image> */
+    max-height: 560px; /* Tamaño máximo igual al height definido en <Image> */
+  }
+  
+  /* Notificación */
+  .notification {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    max-width: 320px;
+    width: 100%;
+    z-index: 50;
+  }
+  
+  .notificationContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  .error {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  
+  .closeButton {
+    color: #666;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .closeButton:hover {
+    color: #333;
+  }
+  
+  /* Responsividad */
+  @media (max-width: 768px) {
+    .banner {
+      flex-direction: column;
+      text-align: center;
+      min-height: auto;
+    }
+  
+    .textSection {
+      padding-right: 0;
+      margin-bottom: 24px;
+    }
+  
+    .title {
+      font-size: 1.8rem;
+    }
+  
+    .subtitle {
+      font-size: 1rem;
+    }
+  
+    .searchBar {
+      flex-direction: column;
+      padding: 12px;
+    }
+  
+    .searchButton {
+      width: 100%;
+    }
+  
+    .imageSection {
+      justify-content: center;
+    }
+  
+    .bannerImage {
+      width: 100%;
+      height: auto;
+      max-width: 400px; /* Reducimos el tamaño máximo en móviles */
+      max-height: 320px;
+    }
+  
+    .notification {
+      top: 8px;
+      right: 8px;
+      max-width: 90%;
+    }
+  }

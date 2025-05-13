@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
-    "@prisma/client": "^6.6.0",
+    "@prisma/client": "^6.7.0",
     "@react-google-maps/api": "^2.20.6",
     "@react-leaflet/core": "^2.1.0",
     "bcrypt": "^5.1.1",
