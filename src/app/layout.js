@@ -3,6 +3,7 @@ import "leaflet/dist/leaflet.css";
 import "../styles/globals.css";
 import Head from "next/head";
 import ClientWhatsAppButton from '../components/ClientWhatsAppButton';
+import Link from 'next/link';
 
 export const metadata = {
   title: 'Sumee App - Únete a nuestra plataforma',
@@ -38,8 +39,27 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </Head>
-      <body className="pt-16">
-        {children}
+      <body className="flex flex-col min-h-screen pt-16">
+        {/* Contenido principal */}
+        <main className="flex-grow">{children}</main>
+
+        {/* Footer */}
+        <footer className="footer">
+          <div className="footer-content">
+            <div className="footer-logo">
+              <h2 className="text-2xl font-bold">Sumee</h2>
+            </div>
+            <p className="footer-text">© 2025 Sumee App. Todos los derechos reservados.</p>
+            <div className="footer-links">
+              <Link href="/about" className="footer-link">Acerca de</Link>
+              <Link href="/contact" className="footer-link">Contacto</Link>
+              <Link href="/privacy" className="footer-link">Privacidad</Link>
+              <Link href="/terms" className="footer-link">Términos</Link>
+            </div>
+          </div>
+        </footer>
+
+        {/* Botón de WhatsApp */}
         <ClientWhatsAppButton />
       </body>
     </html>
