@@ -1,7 +1,6 @@
 // src/app/api/professionals/route.js
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { NextResponse } from 'next/server';
+import prisma from '../../../lib/prisma'; // Usa la instancia singleton de Prisma
 
 export async function GET() {
   try {
@@ -17,7 +16,7 @@ export async function GET() {
         workPhotos: true,
         workedAreas: true,
         experience: true,
-        ratings: {
+        reviews: { // Cambiado de 'ratings' a 'reviews'
           select: {
             value: true,
             comment: true,
@@ -33,24 +32,18 @@ export async function GET() {
     });
 
     const professionalsWithAverageRating = professionals.map((pro) => {
-      const ratings = pro.ratings;
+      const reviews = pro.reviews || []; // Asegura que reviews sea un array, incluso si está vacío
       const averageRating =
-        ratings.length > 0
-          ? ratings.reduce((sum, rating) => sum + rating.value, 0) / ratings.length
+        reviews.length > 0
+          ? reviews.reduce((sum, review) => sum + review.value, 0) / reviews.length
           : 0;
       return { ...pro, averageRating: parseFloat(averageRating.toFixed(1)) };
     });
 
-    return new Response(JSON.stringify(professionalsWithAverageRating), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return NextResponse.json(professionalsWithAverageRating, { status: 200 });
   } catch (error) {
     console.error('Error fetching professionals:', error);
-    return new Response(JSON.stringify({ error: 'Failed to fetch professionals' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return NextResponse.json({ error: 'Failed to fetch professionals' }, { status: 500 });
   }
 }
 
@@ -60,12 +53,9 @@ export async function POST(request) {
     const { name, email, profession, area, phone, photo, workPhotos, workedAreas, experience } = data;
 
     if (!name || !email || !profession || !area) {
-      return new Response(
-        JSON.stringify({ error: 'Missing required fields: name, email, profession, and area are required' }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        }
+      return NextResponse.json(
+        { error: 'Missing required fields: name, email, profession, and area are required' },
+        { status: 400 }
       );
     }
 
@@ -81,36 +71,27 @@ export async function POST(request) {
         workPhotos: {
           create: workPhotos && Array.isArray(workPhotos)
             ? workPhotos.map(url => ({ url }))
-            : []
+            : [],
         },
         workedAreas: {
           create: workedAreas && Array.isArray(workedAreas)
             ? workedAreas.map(name => ({ name }))
-            : []
-        }
+            : [],
+        },
       },
     });
 
-    return new Response(JSON.stringify(newProfessional), {
-      status: 201,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return NextResponse.json(newProfessional, { status: 201 });
   } catch (error) {
     console.error('Error creating professional:', error);
 
     if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
-      return new Response(JSON.stringify({ error: 'Email already exists' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return NextResponse.json({ error: 'Email already exists' }, { status: 400 });
     }
 
-    return new Response(
-      JSON.stringify({ error: 'Failed to save collaborator', details: error.message }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      }
+    return NextResponse.json(
+      { error: 'Failed to save collaborator', details: error.message },
+      { status: 500 }
     );
   }
 }
