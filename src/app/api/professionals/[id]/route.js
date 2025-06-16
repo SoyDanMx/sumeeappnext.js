@@ -1,39 +1,31 @@
-// src/app/api/professionals/[id]/route.js
+// src/app/api/professionals/[id]/rate/route.js
 import { PrismaClient } from '@prisma/client';
+import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
+const JWT_SECRET = 'tu-clave-secreta-muy-segura';
 
-export async function GET(request, { params }) {
+export async function POST(request, { params }) {
   try {
     const { id } = params;
+    const token = request.headers.get('authorization')?.replace('Bearer ', '');
+    if (!token) {
+      return new Response(JSON.stringify({ error: 'No token provided' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const userId = decoded.userId;
+
+    const data = await request.json();
+    const { value, comment } = data;
+
+    // Verificar si el profesional existe
     const professional = await prisma.proCollaborator.findUnique({
       where: { id: parseInt(id) },
-      select: {
-        id: true,
-        name: true,
-        profession: true,
-        email: true,
-        phone: true,
-        area: true,
-        photo: true,
-        workPhotos: true,
-        workedAreas: true,
-        experience: true,
-        ratings: {
-          select: {
-            value: true,
-            comment: true,
-            createdAt: true,
-            user: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        },
-      },
     });
-
     if (!professional) {
       return new Response(JSON.stringify({ error: 'Professional not found' }), {
         status: 404,
@@ -41,23 +33,23 @@ export async function GET(request, { params }) {
       });
     }
 
-    const averageRating =
-      professional.ratings.length > 0
-        ? professional.ratings.reduce((sum, rating) => sum + rating.value, 0) / professional.ratings.length
-        : 0;
+    // Crear la calificación
+    await prisma.rating.create({
+      data: {
+        value: parseInt(value),
+        comment: comment || null,
+        userId: userId,
+        proCollaboratorId: parseInt(id),
+      },
+    });
 
-    const professionalWithAverageRating = {
-      ...professional,
-      averageRating: parseFloat(averageRating.toFixed(1)),
-    };
-
-    return new Response(JSON.stringify(professionalWithAverageRating), {
+    return new Response(JSON.stringify({ message: 'Rating submitted successfully' }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('Error fetching professional:', error);
-    return new Response(JSON.stringify({ error: 'Failed to fetch professional' }), {
+    console.error('Error submitting rating:', error);
+    return new Response(JSON.stringify({ error: 'Failed to submit rating' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
