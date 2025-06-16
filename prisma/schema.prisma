@@ -10,74 +10,102 @@ datasource db {
 
 // Modelo para Colaboradores Profesionales
 model ProCollaborator {
-  id          Int           @id @default(autoincrement())
-  name        String
-  email       String        @unique
-  phone       String?
-  profession  String
-  message     String?
-  area        String?
-  photo       String?
-  experience  String?
-  createdAt   DateTime      @default(now())
-  workPhotos  WorkPhoto[]   // Relación con una tabla separada para fotos
-  workedAreas WorkedArea[]  // Relación con una tabla separada para áreas trabajadas
-  ratings     Rating[]
+  id          Int          @id @default(autoincrement())
+  name        String       @db.VarChar(255)
+  email       String       @unique @db.VarChar(255)
+  phone       String?      @db.VarChar(20)
+  profession  String       @db.VarChar(255)
+  message     String?      @db.VarChar(1000)
+  area        String?      @db.VarChar(255)
+  photo       String?      @db.VarChar(255)
+  experience  String?      @db.VarChar(1000)
+  bio         String?      @db.VarChar(2000) // Campo para la biografía (pestaña Biografía)
+  services    String[]     @default([]) // Campo para lista de servicios (pestaña Servicios)
+  createdAt   DateTime     @default(now())
+  workPhotos  WorkPhoto[]
+  workedAreas WorkedArea[]
+  reviews     Rating[]     @relation("reviews") // Relación con valoraciones (pestaña Reseñas)
+  bookings    Booking[]    @relation("ProfessionalBookings") // Relación con reservas
 
   @@index([profession])
   @@index([area])
+  @@index([email]) // Índice adicional para búsquedas por email
 }
 
 // Nueva tabla para normalizar las fotos de trabajo
 model WorkPhoto {
-  id              Int            @id @default(autoincrement())
-  url             String
+  id                Int             @id @default(autoincrement())
+  url               String          @db.VarChar(255)
   proCollaboratorId Int
-  proCollaborator   ProCollaborator @relation(fields: [proCollaboratorId], references: [id])
+  proCollaborator   ProCollaborator @relation(fields: [proCollaboratorId], references: [id], onDelete: Cascade)
+
+  @@index([proCollaboratorId])
 }
 
 // Nueva tabla para normalizar las áreas trabajadas
 model WorkedArea {
-  id              Int            @id @default(autoincrement())
-  name            String
+  id                Int             @id @default(autoincrement())
+  name              String          @db.VarChar(255)
   proCollaboratorId Int
-  proCollaborator   ProCollaborator @relation(fields: [proCollaboratorId], references: [id])
+  proCollaborator   ProCollaborator @relation(fields: [proCollaboratorId], references: [id], onDelete: Cascade)
+
+  @@index([proCollaboratorId])
 }
 
 // Modelo para Usuarios
 model User {
   id         Int         @id @default(autoincrement())
-  name       String
-  email      String      @unique
-  password   String
-  role       String      @default("user") // Nuevo campo para roles (por ejemplo, "user", "admin")
+  name       String      @db.VarChar(255)
+  email      String      @unique @db.VarChar(255)
+  password   String      @db.VarChar(255)
+  role       String      @default("user") @db.VarChar(50) // Roles: "user", "admin"
   createdAt  DateTime    @default(now())
-  membership Membership?
-  ratings    Rating[]
+  membership Membership? // Relación con membresía
+  ratings    Rating[]    // Relación con valoraciones
+  bookings   Booking[]   // Relación con reservas realizadas
+
+  @@index([email])
 }
 
 // Modelo para Membresías
 model Membership {
-  id                 Int       @id @default(autoincrement())
-  userId             Int       @unique
-  active             Boolean   @default(false)
-  plan               String    @default("basic") // Nuevo campo para tipo de membresía (por ejemplo, "basic", "premium")
-  stripeSubscriptionId String?   // Nuevo campo para almacenar el ID de la suscripción de Stripe
-  createdAt          DateTime  @default(now())
-  expiresAt          DateTime?
-  user               User      @relation(fields: [userId], references: [id])
+  id                   Int       @id @default(autoincrement())
+  userId               Int       @unique
+  active               Boolean   @default(false)
+  plan                 String    @default("basic") @db.VarChar(50) // Tipos: "basic", "premium"
+  stripeSubscriptionId String?   @db.VarChar(255) // ID de suscripción de Stripe
+  createdAt            DateTime  @default(now())
+  expiresAt            DateTime?
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // Modelo para Valoraciones
 model Rating {
   id                Int             @id @default(autoincrement())
-  value             Int             @default(5) // Valor por defecto 5, podrías usar un rango 1-5
-  comment           String?
+  value             Int             @default(5) @db.SmallInt // Rango 1-5
+  comment           String?         @db.VarChar(1000)
   userId            Int
   proCollaboratorId Int
   createdAt         DateTime        @default(now())
-  proCollaborator   ProCollaborator @relation(fields: [proCollaboratorId], references: [id])
-  user              User            @relation(fields: [userId], references: [id])
+  proCollaborator   ProCollaborator @relation("reviews", fields: [proCollaboratorId], references: [id], onDelete: Cascade)
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([proCollaboratorId])
+}
+
+// Modelo para Reservas
+model Booking {
+  id                Int             @id @default(autoincrement())
+  userId            Int
+  proCollaboratorId Int
+  date              DateTime
+  time              String          @db.VarChar(50)
+  status            String          @default("pending") @db.VarChar(50) // Estados: "pending", "confirmed", "cancelled"
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  professional      ProCollaborator @relation("ProfessionalBookings", fields: [proCollaboratorId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([proCollaboratorId])

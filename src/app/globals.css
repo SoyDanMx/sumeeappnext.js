@@ -4,12 +4,13 @@
 @tailwind utilities;
 
 :root {
-  --primary: #7209CF; /* Morado */
+  --primary: #2563eb; /* Azul (#blue-600) alineado con Navbar y caja azul */
   --secondary: #888888; /* Gris */
 }
 
 body {
   font-family: 'Inter', sans-serif;
+  @apply bg-gray-50 text-gray-900 pt-20; /* Padding superior para evitar superposición con Navbar fijo */
 }
 
 .search-input::-webkit-search-cancel-button {
@@ -29,7 +30,7 @@ html {
 /* Utilidades personalizadas para el banner y formulario */
 @layer components {
   .banner-overlay {
-    @apply bg-black bg-opacity-50 p-8 rounded-lg;
+    @apply bg-black p-8 rounded-lg;
   }
 
   .banner-title {
@@ -67,7 +68,7 @@ html {
   }
 
   .submit-button:hover {
-    @apply bg-purple-700;
+    @apply bg-blue-700;
   }
 
   .login-link {
@@ -80,5 +81,10 @@ html {
 
   .login-link a:hover {
     @apply underline;
+  }
+
+  /* Estilos para Navbar fijo */
+  nav {
+    @apply fixed top-0 left-0 right-0 z-50 bg-[var(--primary)] text-white p-4 shadow-md;
   }
 }

@@ -157,11 +157,27 @@ export default function ProfessionalProfile() {
   }
 
   return (
-    <section className="py-20 px-6 bg-gray-50 min-h-screen">
+    <section className="py-12 px-6 bg-gray-50 min-h-screen">
       <div className="container mx-auto max-w-4xl">
-        <h1 className="text-4xl font-bold text-center mb-8">
-          Perfil de {professional.name} / Profile of {professional.name}
-        </h1>
+        {/* Banner del técnico */}
+        <div className="relative h-64 w-full mb-8 rounded-lg overflow-hidden">
+          <Image
+            src="/technician-banner.jpg"
+            alt={`Banner de ${professional.name}`}
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
+            <h1 className="text-2xl font-bold text-white">
+              {professional.name}
+            </h1>
+            <p className="text-white/90">
+              {professional.profession} ★ {professional.averageRating || '5'}/5
+            </p>
+          </div>
+        </div>
+
         <div className="bg-white p-8 rounded-lg shadow-sm">
           <div className="flex flex-col md:flex-row items-center mb-6">
             {professional.photo ? (

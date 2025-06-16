@@ -3,31 +3,32 @@ import "leaflet/dist/leaflet.css";
 import "../styles/globals.css";
 import Head from "next/head";
 import Script from "next/script";
-import ClientWhatsAppButton from '../components/ClientWhatsAppButton';
-import Link from 'next/link';
+import ClientWhatsAppButton from "../components/ClientWhatsAppButton";
+import Navbar from "../components/nav/Navbar";
+import Link from "next/link";
 
 export const metadata = {
-  title: 'Sumee App - Únete a nuestra plataforma',
-  description: 'Regístrate en Sumee App para unirte a nuestra lista de espera y descubre nuestros servicios.',
-  keywords: 'sumee app, lista de espera, membresía, servicios, contacto',
+  title: "Sumee App - Encuentra Profesionales",
+  description: "Conecta con profesionales verificados para tus proyectos en Sumee App.",
+  keywords: "sumee app, profesionales, servicios, reservas, membresía",
   openGraph: {
-    title: 'Sumee App - Únete a nuestra plataforma',
-    description: 'Regístrate en Sumee App para unirte a nuestra lista de espera y descubre nuestros servicios.',
-    url: 'https://sumeeapp.com',
-    siteName: 'Sumee App',
-    locale: 'es_MX',
-    type: 'website',
+    title: "Sumee App - Encuentra Profesionales",
+    description: "Conecta con profesionales verificados para tus proyectos en Sumee App.",
+    url: "https://sumeeapp.com",
+    siteName: "Sumee App",
+    locale: "es_MX",
+    type: "website",
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'Sumee App - Únete a nuestra plataforma',
-    description: 'Regístrate en Sumee App para unirte a nuestra lista de espera y descubre nuestros servicios.',
+    card: "summary_large_image",
+    title: "Sumee App - Encuentra Profesionales",
+    description: "Conecta con profesionales verificados para tus proyectos en Sumee App.",
   },
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="es" style={{ scrollBehavior: 'smooth' }}>
+    <html lang="es" style={{ scrollBehavior: "smooth" }}>
       <Head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -40,7 +41,7 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </Head>
-      <body className="flex flex-col min-h-screen pt-16">
+      <body className="flex flex-col min-h-screen">
         {/* Google Analytics Script */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-DZCY3C3DEJ"
@@ -82,13 +83,16 @@ export default function RootLayout({ children }) {
           <img
             height="1"
             width="1"
-            style={{ display: 'none' }}
+            style={{ display: "none" }}
             src="https://www.facebook.com/tr?id=9719096518211708&ev=PageView&noscript=1"
           />
         </noscript>
 
+        {/* Navbar */}
+        <Navbar />
+
         {/* Contenido principal */}
-        <main className="flex-grow">{children}</main>
+        <main className="flex-grow pt-20">{children}</main>
 
         {/* Footer */}
         <footer className="footer">
