@@ -1,80 +1,71 @@
+// src/app/membership/page.js
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-export default function MembershipPage() {
-  const [isProcessing, setIsProcessing] = useState(false);
+export default function Membership() {
+  const [mostrarPago, setMostrarPago] = useState(false);
   const [error, setError] = useState(null);
+  const router = useRouter();
 
-  const handlePayment = async (plan) => {
-    setIsProcessing(true);
-    setError(null);
+  useEffect(() => {
+    // Cargar el script de Stripe
+    const script = document.createElement("script");
+    script.src = "https://js.stripe.com/v3/buy-button.js";
+    script.async = true;
+    document.head.appendChild(script);
+    return () => document.head.removeChild(script);
+  }, []);
 
+  // Verificar autenticación (opcional, basado en el uso de verifyToken)
+  const handleMembershipClick = async () => {
     try {
-      const response = await fetch("/api/mercadopago", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: "user123" }), // Reemplaza con el userId real
+      const response = await fetch("/api/check-auth", {
+        method: "GET",
+        credentials: "include", // Enviar cookies con el token
       });
-
-      const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.message || "Error al iniciar el pago");
+        setError("Por favor inicia sesión para continuar.");
+        router.push("/login");
+        return;
       }
-
-      if (data.preferenceId) {
-        const mp = new window.MercadoPago(
-          process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY
-        );
-        mp.checkout({
-          preference: {
-            id: data.preferenceId,
-          },
-          autoOpen: true,
-        });
-      }
-    } catch (error) {
-      console.error("Error al iniciar el pago:", error);
-      setError(error.message);
-      setIsProcessing(false);
+      setMostrarPago(true);
+    } catch (err) {
+      setError("Error al verificar autenticación.");
     }
   };
 
   return (
-    <div className="min-h-screen bg-white py-12 px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto text-center">
-        <h1 className="text-4xl font-bold mb-4">Selecciona tu plan</h1>
-        <p className="text-gray-600 mb-10">Choose the plan that best suits your needs</p>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="border rounded-2xl p-6 shadow hover:shadow-lg transition">
-            <h2 className="text-xl font-semibold mb-2">Plan Básico</h2>
-            <p className="text-gray-500 mb-4">Acceso limitado a servicios</p>
+    <div className="p-8 text-center">
+      <h1 className="text-3xl font-bold mb-4">Únete a Nuestra Membresía</h1>
+      <p className="mb-6">Activa tu membresía para conectar con clientes.</p>
+      {error && <p className="text-red-600 mb-4">{error}</p>}
+      <button
+        onClick={handleMembershipClick}
+        className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
+      >
+        Unirse a Membresía
+      </button>
+      {mostrarPago && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full">
+            <h2 className="text-xl font-bold mb-4">Pagar con Stripe</h2>
+            <div className="stripe-container">
+              <stripe-buy-button
+                buy-button-id="buy_btn_1RaSlCE2shKTNR9MbQSGVUMW"
+                publishable-key="pk_live_51P8c4AE2shKTNR9MVARQB4La2uYMMc2shlTCcpcg8Ei6MqqPV1uN5uj6UbB5mpfReRKd4HL2OP1LoF17WXcYYeB000Ot1l847E"
+              ></stripe-buy-button>
+            </div>
             <button
-              onClick={() => handlePayment("basic")}
-              className="bg-purple-600 text-white px-4 py-2 rounded-xl hover:bg-purple-700 transition"
-              disabled={isProcessing}
+              onClick={() => setMostrarPago(false)}
+              className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
             >
-              Pagar con MercadoPago
+              Cerrar
             </button>
           </div>
-          {/* Agrega más planes si deseas */}
         </div>
-
-        {isProcessing && (
-          <div className="mt-10 text-center">
-            <p className="text-gray-700 mb-2 animate-pulse">
-              Estamos procesando tu pago, no cierres esta página...
-            </p>
-            <div className="w-8 h-8 mx-auto border-4 border-purple-600 border-t-transparent rounded-full animate-spin" />
-          </div>
-        )}
-
-        {error && (
-          <p className="mt-4 text-red-600 font-medium">Error: {error}</p>
-        )}
-      </div>
+      )}
     </div>
   );
 }

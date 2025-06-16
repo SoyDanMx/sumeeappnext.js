@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import Cookies from 'js-cookie';
 import { areaCoordinates, defaultCoordinates } from '../utils/coordinates';
+import StripeBuyButton from './StripeBuyButton';
 
 export default function MapSection() {
   const [hasMembership, setHasMembership] = useState(false);
@@ -14,7 +15,6 @@ export default function MapSection() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Verificar si el usuario tiene un membership
         const token = Cookies.get('token');
         if (token) {
           const membershipResponse = await fetch('/api/check-membership', {
@@ -26,7 +26,6 @@ export default function MapSection() {
           setHasMembership(membershipData.hasMembership);
         }
 
-        // Obtener la lista de profesionales
         const professionalsResponse = await fetch('/api/professionals');
         const professionalsData = await professionalsResponse.json();
         setProfessionals(professionalsData);
@@ -56,9 +55,19 @@ export default function MapSection() {
         <h2 className="text-3xl font-bold text-center mb-8">
           Profesionales en tu Área / Professionals in Your Area
         </h2>
+        
+        {/* Sección de Membresía */}
+        <div className="text-center mb-8 p-4 bg-white rounded-lg shadow-md">
+          <h3 className="text-xl font-semibold mb-2">Acceso Premium / Premium Access</h3>
+          <p className="mb-4">Desbloquea todos los profesionales con una membresía / Unlock all professionals with a membership</p>
+          <div className="flex justify-center">
+            <StripeBuyButton />
+          </div>
+        </div>
+
         {hasMembership ? (
           <MapContainer
-            center={[19.4326, -99.1332]} // Centro de la Ciudad de México
+            center={[19.4326, -99.1332]}
             zoom={12}
             style={{ height: '500px', width: '100%' }}
           >
@@ -95,16 +104,12 @@ export default function MapSection() {
             })}
           </MapContainer>
         ) : (
-          <div className="text-center">
-            <p className="text-lg mb-4">
-              Necesitas un membership para ver a los profesionales en el mapa. / You need a membership to view professionals on the map.
-            </p>
-            <button
-              className="bg-primary text-white px-6 py-3 rounded-button hover:bg-opacity-90 transition-colors"
-              onClick={() => window.alert('Funcionalidad de compra de membership aún no implementada.')}
-            >
-              Comprar Membership / Buy Membership
-            </button>
+          <div className="text-center p-8 bg-white rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-4">Contenido Bloqueado / Locked Content</h3>
+            <p className="mb-6">Adquiere una membresía para ver los profesionales en el mapa / Get a membership to view professionals on the map</p>
+            <div className="flex justify-center">
+              <StripeBuyButton />
+            </div>
           </div>
         )}
       </div>

@@ -1,25 +1,35 @@
 // src/app/join-as-pro/page.js
 "use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function JoinAsPro() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    profession: '',
-    message: '',
-    area: '',
-    experience: '',
-    workedAreas: '',
+    name: "",
+    email: "",
+    phone: "",
+    profession: "",
+    message: "",
+    area: "",
+    experience: "",
+    workedAreas: "",
   });
   const [photo, setPhoto] = useState(null);
   const [workPhotos, setWorkPhotos] = useState([]);
   const [notification, setNotification] = useState(null);
+  const [mostrarPago, setMostrarPago] = useState(false); // Estado para el modal de Stripe
   const router = useRouter();
+
+  // Cargar el script de Stripe
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://js.stripe.com/v3/buy-button.js";
+    script.async = true;
+    document.head.appendChild(script);
+    return () => document.head.removeChild(script);
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -33,7 +43,7 @@ export default function JoinAsPro() {
     setWorkPhotos(Array.from(e.target.files));
   };
 
-  const showNotification = (message, type = 'info') => {
+  const showNotification = (message, type = "info") => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 5000);
   };
@@ -48,12 +58,12 @@ export default function JoinAsPro() {
 
     // Validación básica
     if (!formData.name || !formData.email || !formData.profession || !formData.area) {
-      showNotification('Por favor completa los campos obligatorios / Please fill in the required fields', 'error');
+      showNotification("Por favor completa los campos obligatorios / Please fill in the required fields", "error");
       return;
     }
 
     if (!validateEmail(formData.email)) {
-      showNotification('Por favor ingresa un correo electrónico válido / Please enter a valid email address', 'error');
+      showNotification("Por favor ingresa un correo electrónico válido / Please enter a valid email address", "error");
       return;
     }
 
@@ -62,13 +72,13 @@ export default function JoinAsPro() {
       let photoUrl = null;
       if (photo) {
         const photoFormData = new FormData();
-        photoFormData.append('files', photo);
-        const photoResponse = await fetch('/api/upload', {
-          method: 'POST',
+        photoFormData.append("files", photo);
+        const photoResponse = await fetch("/api/upload", {
+          method: "POST",
           body: photoFormData,
         });
         if (!photoResponse.ok) {
-          throw new Error('Error uploading photo');
+          throw new Error("Error uploading photo");
         }
         const photoData = await photoResponse.json();
         photoUrl = photoData.filePaths[0];
@@ -78,15 +88,15 @@ export default function JoinAsPro() {
       let workPhotoUrls = [];
       if (workPhotos.length > 0) {
         const workPhotosFormData = new FormData();
-        workPhotos.forEach((file) => workPhotosFormData.append('files', file));
-        const workPhotosResponse = await fetch('/api/upload', {
-          method: 'POST',
+        workPhotos.forEach((file) => workPhotosFormData.append("files", file));
+        const workPhotosResponse = await fetch("/api/upload", {
+          method: "POST",
           body: workPhotosFormData,
         });
         if (!workPhotosResponse.ok) {
-          throw new Error('Error uploading work photos');
+          throw new Error("Error uploading work photos");
         }
-        const workPhotosData = await workPhotosResponse.json();
+        const workPhotosData = await photoResponse.json();
         workPhotoUrls = workPhotosData.filePaths;
       }
 
@@ -99,31 +109,40 @@ export default function JoinAsPro() {
         area: formData.area,
         photo: photoUrl,
         workPhotos: workPhotoUrls,
-        workedAreas: formData.workedAreas ? formData.workedAreas.split(',').map(area => area.trim()) : [],
+        workedAreas: formData.workedAreas ? formData.workedAreas.split(",").map((area) => area.trim()) : [],
         experience: formData.experience || null,
       };
 
-      const response = await fetch('/api/professionals', {
-        method: 'POST',
+      const response = await fetch("/api/professionals", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(submitData),
       });
 
       if (response.ok) {
-        showNotification('Datos enviados con éxito / Data submitted successfully');
-        setFormData({ name: '', email: '', phone: '', profession: '', message: '', area: '', experience: '', workedAreas: '' });
+        showNotification("Datos enviados con éxito / Data submitted successfully");
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          profession: "",
+          message: "",
+          area: "",
+          experience: "",
+          workedAreas: "",
+        });
         setPhoto(null);
         setWorkPhotos([]);
-        setTimeout(() => router.push('/'), 2000);
+        setMostrarPago(true); // Mostrar el modal de Stripe tras enviar el formulario
       } else {
         const errorData = await response.json();
-        showNotification(errorData.error || 'Error al enviar los datos / Error submitting data', 'error');
+        showNotification(errorData.error || "Error al enviar los datos / Error submitting data", "error");
       }
     } catch (error) {
-      console.error('Error:', error);
-      showNotification(`Error al enviar los datos: ${error.message} / Error submitting data: ${error.message}`, 'error');
+      console.error("Error:", error);
+      showNotification(`Error al enviar los datos: ${error.message} / Error submitting data: ${error.message}`, "error");
     }
   };
 
@@ -135,9 +154,9 @@ export default function JoinAsPro() {
         style={{ backgroundImage: "url('/images/join-as-pro-worker.jpg')" }}
       >
         <div className="banner-overlay">
-          <h1 className="banner-title"></h1>
+          <h1 className="banner-title">Únete como Profesional</h1>
           <p className="banner-subtitle">
-            
+            Conecta con clientes que necesitan tus habilidades. Buscamos Operarios de Todos los Oficios y Profesionistas. Regístrate y comienza a trabajar hoy.
           </p>
         </div>
       </section>
@@ -146,7 +165,7 @@ export default function JoinAsPro() {
       <section className="py-20 px-6 bg-gray-50">
         <div className="container mx-auto max-w-2xl">
           <h1 className="text-4xl font-bold text-center mb-8">
-          Conecta con clientes que necesitan tus habilidades. Buscamos Operarios de Todos los Oficios y Profesionistas. Regístrate y comienza a trabajar hoy.
+            Conecta con clientes que necesitan tus habilidades. Buscamos Operarios de Todos los Oficios y Profesionistas. Regístrate y comienza a trabajar hoy.
           </h1>
           <div className="bg-white p-8 rounded-lg shadow-sm">
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -311,10 +330,33 @@ export default function JoinAsPro() {
                 Enviar / Submit
               </button>
             </form>
-            <p className="login-link text-center">
+            <p className="login-link text-center mt-4">
               ¿Ya tienes una cuenta? <Link href="/login">Inicia sesión aquí</Link>
             </p>
           </div>
+
+          {/* Modal de Stripe */}
+          {mostrarPago && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white p-6 rounded-lg max-w-md w-full">
+                <h2 className="text-xl font-bold mb-4">Completa tu Membresía</h2>
+                <p className="mb-4">Paga ahora para activar tu perfil de profesional.</p>
+                <div className="stripe-container">
+                  <stripe-buy-button
+                    buy-button-id="buy_btn_1RaSlCE2shKTNR9MbQSGVUMW"
+                    publishable-key="pk_live_51P8c4AE2shKTNR9MVARQB4La2uYMMc2shlTCcpcg8Ei6MqqPV1uN5uj6UbB5mpfReRKd4HL2OP1LoF17WXcYYeB000Ot1l847E"
+                  ></stripe-buy-button>
+                </div>
+                <button
+                  onClick={() => setMostrarPago(false)}
+                  className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                  aria-label="Cerrar modal de pago"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          )}
 
           {notification && (
             <div
@@ -324,12 +366,12 @@ export default function JoinAsPro() {
             >
               <div
                 className={`p-4 ${
-                  notification.type === 'error' ? 'bg-red-100' : 'bg-green-100'
+                  notification.type === "error" ? "bg-red-100" : "bg-green-100"
                 } rounded-lg flex justify-between items-center`}
               >
                 <p
                   className={`${
-                    notification.type === 'error' ? 'text-red-800' : 'text-green-800'
+                    notification.type === "error" ? "text-red-800" : "text-green-800"
                   }`}
                 >
                   {notification.message}
