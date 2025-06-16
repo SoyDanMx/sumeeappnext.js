@@ -1,37 +1,37 @@
 // src/app/professionals/[id]/page.js
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import Cookies from 'js-cookie';
-import Image from 'next/image';
-import Link from 'next/link';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import Image from "next/image";
+import Link from "next/link";
+import { toast } from "react-hot-toast"; // Asegúrate de instalar react-hot-toast
 
-export default function ProfessionalProfile() {
+export default function ProfessionalProfile({ params }) {
   const [professional, setProfessional] = useState(null);
   const [hasMembership, setHasMembership] = useState(false);
-  const [rating, setRating] = useState({ value: 0, comment: '' });
-  const [notification, setNotification] = useState(null);
+  const [rating, setRating] = useState({ value: 0, comment: "" });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const router = useRouter();
-  const { id } = useParams();
+  const { id } = params; // Usar params pasado como prop desde el servidor
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Verificar si el usuario tiene un membership
-        const token = Cookies.get('token');
+        const token = Cookies.get("token");
         let membershipStatus = false;
         if (token) {
-          const membershipResponse = await fetch('/api/check-membership', {
+          const membershipResponse = await fetch("/api/check-membership", {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           });
           const membershipData = await membershipResponse.json();
           membershipStatus = membershipData.hasMembership;
-          setHasMembership(membershipData.hasMembership);
+          setHasMembership(membershipStatus);
         }
 
         if (!membershipStatus) {
@@ -42,7 +42,7 @@ export default function ProfessionalProfile() {
         // Obtener los datos del profesional
         const response = await fetch(`/api/professionals/${id}`);
         if (!response.ok) {
-          throw new Error('Error al cargar el profesional');
+          throw new Error("Error al cargar el profesional");
         }
         const data = await response.json();
         setProfessional(data);
@@ -56,9 +56,13 @@ export default function ProfessionalProfile() {
     fetchData();
   }, [id]);
 
-  const showNotification = (message, type = 'info') => {
-    setNotification({ message, type });
-    setTimeout(() => setNotification(null), 5000);
+  const showNotification = (message, type = "info") => {
+    if (typeof toast !== "undefined") {
+      toast[type](message);
+    } else {
+      setNotification({ message, type });
+      setTimeout(() => setNotification(null), 5000);
+    }
   };
 
   const handleRatingChange = (e) => {
@@ -68,41 +72,54 @@ export default function ProfessionalProfile() {
   const handleRatingSubmit = async (e) => {
     e.preventDefault();
     if (rating.value < 1 || rating.value > 5) {
-      showNotification('La calificación debe estar entre 1 y 5 / Rating must be between 1 and 5', 'error');
+      showNotification(
+        "La calificación debe estar entre 1 y 5 / Rating must be between 1 and 5",
+        "error"
+      );
       return;
     }
 
     try {
-      const token = Cookies.get('token');
+      const token = Cookies.get("token");
       if (!token) {
-        showNotification('Debes iniciar sesión para calificar / You must log in to rate', 'error');
-        router.push('/login');
+        showNotification(
+          "Debes iniciar sesión para calificar / You must log in to rate",
+          "error"
+        );
+        router.push("/login");
         return;
       }
 
       const response = await fetch(`/api/professionals/${id}/rate`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(rating),
       });
 
       if (response.ok) {
-        showNotification('Calificación enviada con éxito / Rating submitted successfully');
-        // Actualizar los datos del profesional para mostrar la nueva calificación
+        showNotification(
+          "Calificación enviada con éxito / Rating submitted successfully"
+        );
         const updatedResponse = await fetch(`/api/professionals/${id}`);
         const updatedData = await updatedResponse.json();
         setProfessional(updatedData);
-        setRating({ value: 0, comment: '' });
+        setRating({ value: 0, comment: "" });
       } else {
         const errorData = await response.json();
-        showNotification(errorData.error || 'Error al enviar la calificación / Error submitting rating', 'error');
+        showNotification(
+          errorData.error || "Error al enviar la calificación / Error submitting rating",
+          "error"
+        );
       }
     } catch (error) {
-      console.error('Error:', error);
-      showNotification('Error al enviar la calificación / Error submitting rating', 'error');
+      console.error("Error:", error);
+      showNotification(
+        "Error al enviar la calificación / Error submitting rating",
+        "error"
+      );
     }
   };
 
@@ -134,10 +151,11 @@ export default function ProfessionalProfile() {
             Perfil del Profesional / Professional Profile
           </h1>
           <p className="text-lg mb-4">
-            Necesitas un membership para ver los detalles del profesional. / You need a membership to view the Professional&apos;s Details.
+            Necesitas un membership para ver los detalles del profesional. / You need a
+            membership to view the Professional's Details.
           </p>
           <Link href="/buy-membership">
-            <button className="bg-primary text-white px-6 py-3 rounded-button hover:bg-opacity-90 transition-colors">
+            <button className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors">
               Comprar Membership / Buy Membership
             </button>
           </Link>
@@ -162,18 +180,20 @@ export default function ProfessionalProfile() {
         {/* Banner del técnico */}
         <div className="relative h-64 w-full mb-8 rounded-lg overflow-hidden">
           <Image
-            src="/technician-banner.jpg"
+            src="/images/technician-banner.jpg" // Corrección de ruta
             alt={`Banner de ${professional.name}`}
             fill
             className="object-cover"
             priority
+            onError={(e) => {
+              e.target.style.display = "none";
+              console.error("Imagen no encontrada");
+            }}
           />
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
-            <h1 className="text-2xl font-bold text-white">
-              {professional.name}
-            </h1>
+            <h1 className="text-2xl font-bold text-white">{professional.name}</h1>
             <p className="text-white/90">
-              {professional.profession} ★ {professional.averageRating || '5'}/5
+              {professional.profession} ★ {professional.averageRating || "5"}/5
             </p>
           </div>
         </div>
@@ -199,15 +219,25 @@ export default function ProfessionalProfile() {
               <div className="flex items-center mt-2">
                 <span className="text-yellow-500">★</span>
                 <span className="ml-1 text-gray-700">
-                  {professional.averageRating || 'Sin calificaciones'}
+                  {professional.averageRating || "Sin calificaciones"}
                 </span>
               </div>
             </div>
           </div>
-          <p className="text-gray-600 mb-2"><strong>Email:</strong> {professional.email}</p>
-          {professional.phone && <p className="text-gray-600 mb-2"><strong>Teléfono / Phone:</strong> {professional.phone}</p>}
-          {professional.area && <p className="text-gray-600 mb-2"><strong>Área de Trabajo / Work Area:</strong> {professional.area}</p>}
-          
+          <p className="text-gray-600 mb-2">
+            <strong>Email:</strong> {professional.email}
+          </p>
+          {professional.phone && (
+            <p className="text-gray-600 mb-2">
+              <strong>Teléfono / Phone:</strong> {professional.phone}
+            </p>
+          )}
+          {professional.area && (
+            <p className="text-gray-600 mb-2">
+              <strong>Área de Trabajo / Work Area:</strong> {professional.area}
+            </p>
+          )}
+
           {/* Experiencia */}
           {professional.experience && (
             <div className="mt-6">
@@ -219,7 +249,9 @@ export default function ProfessionalProfile() {
           {/* Áreas Trabajadas */}
           {professional.workedAreas && professional.workedAreas.length > 0 && (
             <div className="mt-6">
-              <h3 className="text-xl font-semibold mb-2">Áreas Donde Ha Trabajado / Areas Worked</h3>
+              <h3 className="text-xl font-semibold mb-2">
+                Áreas Donde Ha Trabajado / Areas Worked
+              </h3>
               <ul className="list-disc list-inside text-gray-600">
                 {professional.workedAreas.map((area, index) => (
                   <li key={index}>{area}</li>
@@ -250,19 +282,23 @@ export default function ProfessionalProfile() {
           {/* Calificaciones */}
           <div className="mt-6">
             <h3 className="text-xl font-semibold mb-2">Calificaciones / Ratings</h3>
-            {professional.ratings.length === 0 ? (
+            {professional.reviews.length === 0 ? (
               <p className="text-gray-600">Aún no hay calificaciones. / No ratings yet.</p>
             ) : (
               <div className="space-y-4">
-                {professional.ratings.map((rating, index) => (
+                {professional.reviews.map((review, index) => (
                   <div key={index} className="border-b pb-2">
                     <div className="flex items-center">
                       <span className="text-yellow-500">★</span>
-                      <span className="ml-1 text-gray-700">{rating.value}</span>
-                      <span className="ml-2 text-gray-500">por / by {rating.user.name}</span>
+                      <span className="ml-1 text-gray-700">{review.value}</span>
+                      <span className="ml-2 text-gray-500">por / by {review.user.name}</span>
                     </div>
-                    {rating.comment && <p className="text-gray-600 mt-1">{rating.comment}</p>}
-                    <p className="text-gray-500 text-sm">{new Date(rating.createdAt).toLocaleDateString()}</p>
+                    {review.comment && (
+                      <p className="text-gray-600 mt-1">{review.comment}</p>
+                    )}
+                    <p className="text-gray-500 text-sm">
+                      {new Date(review.createdAt).toLocaleDateString()}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -271,10 +307,15 @@ export default function ProfessionalProfile() {
 
           {/* Formulario para calificar */}
           <div className="mt-6">
-            <h3 className="text-xl font-semibold mb-2">Califica a este Profesional / Rate this Professional</h3>
+            <h3 className="text-xl font-semibold mb-2">
+              Califica a este Profesional / Rate this Professional
+            </h3>
             <form onSubmit={handleRatingSubmit} className="space-y-4">
               <div>
-                <label htmlFor="ratingValue" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="ratingValue"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Calificación / Rating (1-5) *
                 </label>
                 <input
@@ -285,12 +326,15 @@ export default function ProfessionalProfile() {
                   max="5"
                   value={rating.value}
                   onChange={handleRatingChange}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
                   required
                 />
               </div>
               <div>
-                <label htmlFor="ratingComment" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="ratingComment"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Comentario / Comment (Opcional)
                 </label>
                 <textarea
@@ -298,49 +342,20 @@ export default function ProfessionalProfile() {
                   name="comment"
                   value={rating.comment}
                   onChange={handleRatingChange}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
                   rows="3"
                   placeholder="Escribe tu comentario aquí / Write your comment here"
                 ></textarea>
               </div>
               <button
                 type="submit"
-                className="w-full bg-primary text-white px-4 py-2 rounded-button hover:bg-opacity-90 transition-colors"
+                className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
               >
                 Enviar Calificación / Submit Rating
               </button>
             </form>
           </div>
         </div>
-
-        {notification && (
-          <div
-            className="fixed top-4 right-4 max-w-sm w-full bg-white rounded-lg shadow-lg z-50"
-            role="alert"
-            aria-live="assertive"
-          >
-            <div
-              className={`p-4 ${
-                notification.type === 'error' ? 'bg-red-100' : 'bg-green-100'
-              } rounded-lg flex justify-between items-center`}
-            >
-              <p
-                className={`${
-                  notification.type === 'error' ? 'text-red-800' : 'text-green-800'
-                }`}
-              >
-                {notification.message}
-              </p>
-              <button
-                onClick={() => setNotification(null)}
-                className="text-gray-500 hover:text-gray-700"
-                aria-label="Cerrar notificación"
-              >
-                <i className="ri-close-line"></i>
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </section>
   );

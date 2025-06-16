@@ -20,6 +20,7 @@ export default function TechnicianBanner({ professional }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center justify-between">
         <div className="lg:w-1/2 text-left">
           <h1 className="text-4xl font-bold mb-6">Encuentra técnicos verificados en minutos</h1>
+          Conectamos expertos certificados con personas que necesitan servicios técnicos de calidad
           <div className="flex items-center mb-6">
             <input
               type="text"

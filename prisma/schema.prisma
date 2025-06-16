@@ -1,11 +1,13 @@
 generator client {
   provider = "prisma-client-js"
   output   = "../node_modules/.prisma/client"
+  engineType = "binary" // Añadido para compatibilidad con Vercel
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL") // Recomendado para migraciones
 }
 
 // Modelo para Colaboradores Profesionales
@@ -19,20 +21,21 @@ model ProCollaborator {
   area        String?      @db.VarChar(255)
   photo       String?      @db.VarChar(255)
   experience  String?      @db.VarChar(1000)
-  bio         String?      @db.VarChar(2000) // Campo para la biografía (pestaña Biografía)
-  services    String[]     @default([]) // Campo para lista de servicios (pestaña Servicios)
+  bio         String?      @db.VarChar(2000)
+  services    String[]     @default([])
   createdAt   DateTime     @default(now())
   workPhotos  WorkPhoto[]
   workedAreas WorkedArea[]
-  reviews     Rating[]     @relation("reviews") // Relación con valoraciones (pestaña Reseñas)
-  bookings    Booking[]    @relation("ProfessionalBookings") // Relación con reservas
+  reviews     Rating[]     @relation("reviews")
+  bookings    Booking[]    @relation("ProfessionalBookings")
+  bannerImage String?      @db.VarChar(255) // Añadido para soportar banners personalizados
 
   @@index([profession])
   @@index([area])
-  @@index([email]) // Índice adicional para búsquedas por email
+  @@index([email])
 }
 
-// Nueva tabla para normalizar las fotos de trabajo
+// Tabla para fotos de trabajo
 model WorkPhoto {
   id                Int             @id @default(autoincrement())
   url               String          @db.VarChar(255)
@@ -42,7 +45,7 @@ model WorkPhoto {
   @@index([proCollaboratorId])
 }
 
-// Nueva tabla para normalizar las áreas trabajadas
+// Tabla para áreas trabajadas
 model WorkedArea {
   id                Int             @id @default(autoincrement())
   name              String          @db.VarChar(255)
@@ -58,11 +61,11 @@ model User {
   name       String      @db.VarChar(255)
   email      String      @unique @db.VarChar(255)
   password   String      @db.VarChar(255)
-  role       String      @default("user") @db.VarChar(50) // Roles: "user", "admin"
+  role       String      @default("user") @db.VarChar(50)
   createdAt  DateTime    @default(now())
-  membership Membership? // Relación con membresía
-  ratings    Rating[]    // Relación con valoraciones
-  bookings   Booking[]   // Relación con reservas realizadas
+  membership Membership?
+  ratings    Rating[]
+  bookings   Booking[]
 
   @@index([email])
 }
@@ -72,8 +75,8 @@ model Membership {
   id                   Int       @id @default(autoincrement())
   userId               Int       @unique
   active               Boolean   @default(false)
-  plan                 String    @default("basic") @db.VarChar(50) // Tipos: "basic", "premium"
-  stripeSubscriptionId String?   @db.VarChar(255) // ID de suscripción de Stripe
+  plan                 String    @default("basic") @db.VarChar(50)
+  stripeSubscriptionId String?   @db.VarChar(255)
   createdAt            DateTime  @default(now())
   expiresAt            DateTime?
   user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -82,7 +85,7 @@ model Membership {
 // Modelo para Valoraciones
 model Rating {
   id                Int             @id @default(autoincrement())
-  value             Int             @default(5) @db.SmallInt // Rango 1-5
+  value             Int             @default(5) @db.SmallInt
   comment           String?         @db.VarChar(1000)
   userId            Int
   proCollaboratorId Int
@@ -101,7 +104,7 @@ model Booking {
   proCollaboratorId Int
   date              DateTime
   time              String          @db.VarChar(50)
-  status            String          @default("pending") @db.VarChar(50) // Estados: "pending", "confirmed", "cancelled"
+  status            String          @default("pending") @db.VarChar(50)
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
   user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)

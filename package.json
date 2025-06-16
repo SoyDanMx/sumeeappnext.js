@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint . --ext .js,.jsx",
     "lint:fix": "eslint . --ext .js,.jsx --fix",
-    "postinstall": "prisma generate",
+    "postinstall": "prisma generate --engine-type binary",
     "test": "jest"
   },
   "dependencies": {
