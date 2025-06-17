@@ -1,115 +1,57 @@
-generator client {
-  provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
-  engineType = "binary" // Añadido para compatibilidad con Vercel
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL") // Recomendado para migraciones
 }
 
-// Modelo para Colaboradores Profesionales
+generator client {
+  provider = "prisma-client-js"
+  engineType = "binary"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  reviews   Review[]
+  createdAt DateTime @default(now())
+}
+
 model ProCollaborator {
-  id          Int          @id @default(autoincrement())
-  name        String       @db.VarChar(255)
-  email       String       @unique @db.VarChar(255)
-  phone       String?      @db.VarChar(20)
-  profession  String       @db.VarChar(255)
-  message     String?      @db.VarChar(1000)
-  area        String?      @db.VarChar(255)
-  photo       String?      @db.VarChar(255)
-  experience  String?      @db.VarChar(1000)
-  bio         String?      @db.VarChar(2000)
-  services    String[]     @default([])
-  createdAt   DateTime     @default(now())
+  id          Int         @id @default(autoincrement())
+  name        String
+  email       String      @unique
+  profession  String
+  area        String
+  phone       String?
+  photo       String?
+  experience  String?
   workPhotos  WorkPhoto[]
   workedAreas WorkedArea[]
-  reviews     Rating[]     @relation("reviews")
-  bookings    Booking[]    @relation("ProfessionalBookings")
-  bannerImage String?      @db.VarChar(255) // Añadido para soportar banners personalizados
-
-  @@index([profession])
-  @@index([area])
-  @@index([email])
+  reviews     Review[]
+  createdAt   DateTime    @default(now())
 }
 
-// Tabla para fotos de trabajo
 model WorkPhoto {
-  id                Int             @id @default(autoincrement())
-  url               String          @db.VarChar(255)
+  id            Int           @id @default(autoincrement())
+  url           String
+  proCollaborator ProCollaborator @relation(fields: [proCollaboratorId], references: [id])
   proCollaboratorId Int
-  proCollaborator   ProCollaborator @relation(fields: [proCollaboratorId], references: [id], onDelete: Cascade)
-
-  @@index([proCollaboratorId])
 }
 
-// Tabla para áreas trabajadas
 model WorkedArea {
-  id                Int             @id @default(autoincrement())
-  name              String          @db.VarChar(255)
+  id            Int           @id @default(autoincrement())
+  name          String
+  proCollaborator ProCollaborator @relation(fields: [proCollaboratorId], references: [id])
   proCollaboratorId Int
-  proCollaborator   ProCollaborator @relation(fields: [proCollaboratorId], references: [id], onDelete: Cascade)
-
-  @@index([proCollaboratorId])
 }
 
-// Modelo para Usuarios
-model User {
-  id         Int         @id @default(autoincrement())
-  name       String      @db.VarChar(255)
-  email      String      @unique @db.VarChar(255)
-  password   String      @db.VarChar(255)
-  role       String      @default("user") @db.VarChar(50)
-  createdAt  DateTime    @default(now())
-  membership Membership?
-  ratings    Rating[]
-  bookings   Booking[]
-
-  @@index([email])
-}
-
-// Modelo para Membresías
-model Membership {
-  id                   Int       @id @default(autoincrement())
-  userId               Int       @unique
-  active               Boolean   @default(false)
-  plan                 String    @default("basic") @db.VarChar(50)
-  stripeSubscriptionId String?   @db.VarChar(255)
-  createdAt            DateTime  @default(now())
-  expiresAt            DateTime?
-  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-// Modelo para Valoraciones
-model Rating {
-  id                Int             @id @default(autoincrement())
-  value             Int             @default(5) @db.SmallInt
-  comment           String?         @db.VarChar(1000)
-  userId            Int
+model Review {
+  id              Int           @id @default(autoincrement())
+  value           Int
+  comment         String?
+  createdAt       DateTime      @default(now())
+  userId          Int
   proCollaboratorId Int
-  createdAt         DateTime        @default(now())
-  proCollaborator   ProCollaborator @relation("reviews", fields: [proCollaboratorId], references: [id], onDelete: Cascade)
-  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([proCollaboratorId])
-}
-
-// Modelo para Reservas
-model Booking {
-  id                Int             @id @default(autoincrement())
-  userId            Int
-  proCollaboratorId Int
-  date              DateTime
-  time              String          @db.VarChar(50)
-  status            String          @default("pending") @db.VarChar(50)
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  professional      ProCollaborator @relation("ProfessionalBookings", fields: [proCollaboratorId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([proCollaboratorId])
+  user            User          @relation(fields: [userId], references: [id])
+  proCollaborator ProCollaborator @relation(fields: [proCollaboratorId], references: [id])
 }
