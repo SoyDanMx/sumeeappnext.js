@@ -16,3 +16,10 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+module.exports = {
+  publicRuntimeConfig: {
+    api: {
+      skipAuth: ['/api/healthcheck']
+    }
+  }
+}

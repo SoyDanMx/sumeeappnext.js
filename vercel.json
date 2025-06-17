@@ -1,14 +1,21 @@
 {
-  "version": 2,
+  "version": 3,
   "builds": [
     {
-      "src": "package.json",
-      "use": "@vercel/node"
+      "src": "next.config.js",
+      "use": "@vercel/next",
+      "config": {
+        "includeFiles": ["prisma/schema.prisma"]
+      }
     }
   ],
-  "build": {
-    "env": {
-      "PRISMA_GENERATE_SKIP_AUTOINSTALL": "true"
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1",
+      "headers": {
+        "Access-Control-Allow-Origin": "*"
+      }
     }
-  }
+  ]
 }
